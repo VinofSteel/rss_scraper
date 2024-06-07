@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -45,6 +46,21 @@ func (cfg *ApiConfig) FeedsCreate(w http.ResponseWriter, r *http.Request, user d
 	respondWithJSON(w, http.StatusOK, databaseFeedToFeed(feed))
 }
 
+func (cfg *ApiConfig) FeedsGetAll(w http.ResponseWriter, r *http.Request) {
+	feeds, err := cfg.DB.ListAllFeeds(r.Context())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, "No feeds in the database")
+			return
+		}
+
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get all feeds")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseFeedSliceToFeedSlice(feeds))
+}
+
 // Utilities
 func databaseFeedToFeed(feed database.Feed) Feed {
 	return Feed{
@@ -55,4 +71,21 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 		Url:       feed.Url,
 		UserID:    feed.UserID,
 	}
+}
+
+func databaseFeedSliceToFeedSlice(feed []database.Feed) []Feed {
+	var output []Feed
+
+	for _, feed := range feed {
+		output = append(output, Feed{
+			ID:        feed.ID,
+			CreatedAt: feed.CreatedAt,
+			UpdatedAt: feed.UpdatedAt,
+			Name:      feed.Name,
+			Url:       feed.Url,
+			UserID:    feed.UserID,
+		})
+	}
+
+	return output
 }

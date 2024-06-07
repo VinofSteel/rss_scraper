@@ -56,6 +56,7 @@ func main() {
 
 	// Feeds
 	mux.HandleFunc("POST /v1/feeds", apiConfig.MiddlewareAuth(apiConfig.FeedsCreate))
+	mux.HandleFunc("GET /v1/feeds", apiConfig.FeedsGetAll)
 
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
