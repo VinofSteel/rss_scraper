@@ -19,18 +19,18 @@ run: fmt
 	air
 .PHONY: run
 
-migrate-up:
+m-up:
 	goose -dir sql/schema postgres "$(PG_CONN_STRING)" up
-.PHONY: migrate-up
+.PHONY: m-up
 
-migrate-down:
+m-down:
 	goose -dir sql/schema postgres "$(PG_CONN_STRING)" down
-.PHONY: migrate-down
+.PHONY: m-down
 
-migrate-status:
+m-status:
 	goose -dir sql/schema postgres "$(PG_CONN_STRING)" status
-.PHONY: migrate-status
+.PHONY: m-status
 
-migrate-create:
-	goose -dir sql/schema create $(name) sql
-.PHONY: migrate-create
+m-redo:
+	goose -dir sql/schema redo $(name) sql
+.PHONY: m-redo
