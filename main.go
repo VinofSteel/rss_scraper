@@ -50,6 +50,9 @@ func main() {
 	mux.HandleFunc("GET /v1/healthz", apiConfig.Readiness)
 	mux.HandleFunc("GET /v1/err", apiConfig.Error)
 
+	// Users
+	mux.HandleFunc("POST /v1/users", apiConfig.UsersCreate)
+
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		ReadTimeout:  30 * time.Second,
