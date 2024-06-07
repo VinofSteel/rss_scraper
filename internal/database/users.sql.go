@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -38,7 +37,7 @@ const getUserByApiKey = `-- name: GetUserByApiKey :one
 SELECT id, created_at, updated_at, name, api_key FROM users WHERE api_key = $1
 `
 
-func (q *Queries) GetUserByApiKey(ctx context.Context, apiKey sql.NullString) (User, error) {
+func (q *Queries) GetUserByApiKey(ctx context.Context, apiKey string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByApiKey, apiKey)
 	var i User
 	err := row.Scan(

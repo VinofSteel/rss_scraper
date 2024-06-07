@@ -52,6 +52,7 @@ func main() {
 
 	// Users
 	mux.HandleFunc("POST /v1/users", apiConfig.UsersCreate)
+	mux.HandleFunc("GET /v1/users", apiConfig.UsersGetByApiKey)
 
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
