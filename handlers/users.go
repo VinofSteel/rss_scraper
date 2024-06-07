@@ -50,7 +50,7 @@ func (cfg *ApiConfig) UsersGetByApiKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.DB.GetUserByApiKey(r.Context(), apiKey)
+	user, err := cfg.DB.GetUserByAPIKey(r.Context(), apiKey)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			respondWithError(w, http.StatusNotFound, "User not found")
