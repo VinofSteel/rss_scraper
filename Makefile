@@ -16,7 +16,7 @@ test: fmt
 .PHONY: test
 
 run: fmt
-	go build && rssscraper.exe
+	air
 .PHONY: run
 
 migrate-up:

@@ -4,7 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/vinofsteel/rssscraper/internal/database"
 )
+
+type ApiConfig struct {
+	DB *database.Queries
+}
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	if code > 499 {
