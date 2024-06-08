@@ -43,7 +43,24 @@ func (cfg *ApiConfig) FeedsCreate(w http.ResponseWriter, r *http.Request, user d
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseFeedToFeed(feed))
+	feedFollow, err := cfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed follow")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, struct {
+		Feed       Feed       `json:"feed"`
+		FeedFollow FeedFollow `json:"feed_follow"`
+	}{
+		Feed:       databaseFeedToFeed(feed),
+		FeedFollow: databaseFeedFollowToFeedFollow(feedFollow),
+	})
 }
 
 func (cfg *ApiConfig) FeedsGetAll(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +75,7 @@ func (cfg *ApiConfig) FeedsGetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseFeedSliceToFeedSlice(feeds))
+	respondWithJSON(w, http.StatusOK, databaseFeedsToFeeds(feeds))
 }
 
 // Utilities
@@ -73,19 +90,11 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 	}
 }
 
-func databaseFeedSliceToFeedSlice(feed []database.Feed) []Feed {
-	var output []Feed
-
-	for _, feed := range feed {
-		output = append(output, Feed{
-			ID:        feed.ID,
-			CreatedAt: feed.CreatedAt,
-			UpdatedAt: feed.UpdatedAt,
-			Name:      feed.Name,
-			Url:       feed.Url,
-			UserID:    feed.UserID,
-		})
+func databaseFeedsToFeeds(feeds []database.Feed) []Feed {
+	result := make([]Feed, len(feeds))
+	for i, feed := range feeds {
+		result[i] = databaseFeedToFeed(feed)
 	}
 
-	return output
+	return result
 }
