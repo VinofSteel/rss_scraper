@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := run
+.DEFAULT_GOAL := build
 
 ifneq (,$(wildcard ./.env))
     include .env
@@ -11,13 +11,13 @@ fmt:
 	gofmt -w .
 .PHONY: fmt
 
-test: fmt
-	go test ./... -count=1
-.PHONY: test
-
 run: fmt
 	air
 .PHONY: run
+
+build: m-up
+	go build && rssscraper.exe
+.PHONY: build
 
 m-up:
 	goose -dir sql/schema postgres "$(PG_CONN_STRING)" up
