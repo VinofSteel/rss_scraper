@@ -53,3 +53,11 @@ func nullTimeToTimePtr(t sql.NullTime) *time.Time {
 
 	return nil
 }
+
+func nullStringToStringPtr(s sql.NullString) *string {
+	if s.Valid {
+		return &s.String
+	}
+
+	return nil
+}

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -64,6 +65,9 @@ func main() {
 	mux.HandleFunc("GET /v1/feed_follows", apiConfig.MiddlewareAuth(apiConfig.FeedFollowsGetByUser))
 	mux.HandleFunc("DELETE /v1/feed_follows/{feedFollowID}", apiConfig.MiddlewareAuth(apiConfig.FeedFollowsDelete))
 
+	// Posts
+	mux.HandleFunc("GET /v1/posts", apiConfig.MiddlewareAuth(apiConfig.PostsGetByUser))
+
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		ReadTimeout:  30 * time.Second,
@@ -72,8 +76,8 @@ func main() {
 		Handler:      mux,
 	}
 
-	const collectionConcurrency = 10
-	const collectionInterval = 30 * time.Second
+	collectionConcurrency := runtime.NumCPU()
+	collectionInterval := time.Minute
 	go startScraping(dbQueries, collectionConcurrency, collectionInterval)
 
 	log.Printf("Server running in port :%s\n", os.Getenv("PORT"))
