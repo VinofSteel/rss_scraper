@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/vinofsteel/rssscraper/internal/database"
 )
@@ -42,4 +44,12 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	w.WriteHeader(code)
 	w.Write(dat)
+}
+
+func nullTimeToTimePtr(t sql.NullTime) *time.Time {
+	if t.Valid {
+		return &t.Time
+	}
+
+	return nil
 }

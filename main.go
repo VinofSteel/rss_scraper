@@ -42,8 +42,9 @@ func main() {
 	log.Println("Connection opened succesfully!")
 
 	// Setting up our api configuration
+	dbQueries := database.New(db)
 	apiConfig := handlers.ApiConfig{
-		DB: database.New(db),
+		DB: dbQueries,
 	}
 
 	mux := http.NewServeMux()
@@ -70,6 +71,10 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 		Handler:      mux,
 	}
+
+	const collectionConcurrency = 10
+	const collectionInterval = 30 * time.Second
+	go startScraping(dbQueries, collectionConcurrency, collectionInterval)
 
 	log.Printf("Server running in port :%s\n", os.Getenv("PORT"))
 	if err := server.ListenAndServe(); err != nil {
