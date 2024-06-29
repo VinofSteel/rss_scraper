@@ -49,3 +49,42 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (User, err
 	)
 	return i, err
 }
+
+const listAllUsers = `-- name: ListAllUsers :many
+SELECT id, created_at, updated_at, name, api_key FROM users ORDER BY $1 OFFSET $2 LIMIT $3
+`
+
+type ListAllUsersParams struct {
+	Column1 interface{}
+	Offset  int32
+	Limit   int32
+}
+
+func (q *Queries) ListAllUsers(ctx context.Context, arg ListAllUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listAllUsers, arg.Column1, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.ApiKey,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -8,10 +8,12 @@ import (
 	"time"
 
 	"github.com/vinofsteel/rssscraper/internal/database"
+	"github.com/vinofsteel/rssscraper/internal/validation"
 )
 
 type ApiConfig struct {
 	DB *database.Queries
+	Validator *validation.Validator
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -24,6 +26,19 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 	}
 	respondWithJSON(w, code, errorResponse{
 		Error: msg,
+	})
+}
+
+func respondWithErrorMap(w http.ResponseWriter, code int, errors map[string]string) {
+	if code > 499 {
+		log.Printf("Responding with 5XX error: %s", errors)
+	}
+
+	type errorResponse struct {
+		FieldErrors map[string]string `json:"field_errors"`
+	}
+	respondWithJSON(w, code, errorResponse{
+		FieldErrors: errors,
 	})
 }
 

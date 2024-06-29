@@ -21,12 +21,18 @@ type User struct {
 
 func (cfg *ApiConfig) UsersCreate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string `json:"name"`
+		Name string `json:"name" validate:"required"`
 	}
 
 	params := parameters{}
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+		return
+	}
+
+	errors := cfg.Validator.ValidateData(params)
+	if errors != nil {
+		respondWithErrorMap(w, http.StatusBadRequest, errors)
 		return
 	}
 

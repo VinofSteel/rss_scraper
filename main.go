@@ -9,10 +9,12 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/vinofsteel/rssscraper/handlers"
 	"github.com/vinofsteel/rssscraper/internal/database"
+	"github.com/vinofsteel/rssscraper/internal/validation"
 )
 
 func main() {
@@ -44,8 +46,13 @@ func main() {
 
 	// Setting up our api configuration
 	dbQueries := database.New(db)
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	validation := validation.New(validate)
+
 	apiConfig := handlers.ApiConfig{
 		DB: dbQueries,
+		Validator: validation,
 	}
 
 	mux := http.NewServeMux()
